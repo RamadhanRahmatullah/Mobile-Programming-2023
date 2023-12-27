@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'profile_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,7 +21,7 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   bool _isAgree = false;
-  String _password = '';
+  TextEditingController nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,7 @@ class _SignUpPageState extends State<SignUpPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
+              controller: nameController,
               decoration: InputDecoration(
                 labelText: 'Name',
                 prefixIcon: Icon(Icons.person),
@@ -53,19 +55,12 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             SizedBox(height: 16.0),
             TextFormField(
-              onChanged: (value) {
-                setState(() {
-                  _password = value;
-                });
-              },
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
                 prefixIcon: Icon(Icons.lock),
               ),
             ),
-            SizedBox(height: 16.0),
-            PasswordLevel(password: _password),
             SizedBox(height: 16.0),
             CheckboxListTile(
               title: Text('I agree with the Privacy Policy'),
@@ -81,7 +76,13 @@ class _SignUpPageState extends State<SignUpPage> {
             ElevatedButton(
               onPressed: _isAgree
                   ? () {
-                      // Add your sign-up logic here
+                      // Navigate to the profile page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(name: nameController.text),
+                        ),
+                      );
                     }
                   : null,
               child: Text('Sign Up Account'),
@@ -93,53 +94,5 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
-  }
-}
-
-class PasswordLevel extends StatelessWidget {
-  final String password;
-
-  PasswordLevel({required this.password});
-
-  @override
-  Widget build(BuildContext context) {
-    String level = determinePasswordLevel(password);
-    Color levelColor = determineLevelColor(level);
-
-    return Text(
-      'Password Level: $level',
-      style: TextStyle(
-        color: levelColor,
-      ),
-    );
-  }
-
-  String determinePasswordLevel(String password) {
-    if (password.length >= 6 && password.length < 8) {
-      return 'Low';
-    } else if (password.length >= 8 &&
-        RegExp(r'[a-z]').hasMatch(password) &&
-        RegExp(r'[A-Z]').hasMatch(password) &&
-        RegExp(r'[0-9]').hasMatch(password)) {
-      return 'Fair';
-    } else if (password.length >= 8 &&
-        RegExp(r'(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])').hasMatch(password)) {
-      return 'Good';
-    } else {
-      return 'Low';
-    }
-  }
-
-  Color determineLevelColor(String level) {
-    switch (level) {
-      case 'Low':
-        return Colors.red;
-      case 'Fair':
-        return Colors.orange;
-      case 'Good':
-        return Colors.green;
-      default:
-        return Colors.black;
-    }
   }
 }
